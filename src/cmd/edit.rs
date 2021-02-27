@@ -28,7 +28,7 @@ impl Cmd for Edit {
 }
 
 fn registry_path(crate_name: &str) -> PathBuf {
-    // FIXME: Give back real path
+    // FIXME: Find the crate directory under the cargo home. If no, maybe we have to do git clone.
     return PathBuf::from(
         "/Users/nakabonne/.cargo/registry/src/github.com-1ecc6299db9ec823/reqwest-0.11.1",
     );
@@ -36,13 +36,13 @@ fn registry_path(crate_name: &str) -> PathBuf {
 
 // Copy the given src to the given dst. And then give back the path to newly created one.
 fn copy_dir(src: PathBuf, dst: PathBuf) -> Result<PathBuf> {
-    // FIXME: Mkdir if non-exixtence
+    // FIXME: Mkdir if non-existence
 
     // TODO: Remove dependency on platform. Refer to gohack's implementation.
     let out = Command::new("cp").arg("-rf").arg(src).arg(dst).output();
     match out {
         Ok(_) => {
-            // FIXME: Use the real path
+            // FIXME: Give back the newly created one
             let path = PathBuf::from("/Users/nakabonne/.rhack/reqwest-0.11.1");
             Ok(path)
         }
