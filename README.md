@@ -1,18 +1,19 @@
 # rhack
+Are you want to put a sneaky `dbg!` macro into external crates to find out how some internal data structure works? If so `rhack` is for you!
 
 ## Usage
 
-Let's say you want to modify reqwest crate.
+Let's say you want to modify the `reqwest` crate.
 
 ```toml
 [dependencies]
 reqwest = "0.11"
 ```
 
-Run `rhack get`:
+Run `rhack edit`:
 
 ```
-$ rhack get reqwest
+$ rhack edit reqwest
 ```
 
 This will make a copy of the crate into $HOME/.rhack/reqwest-0.11.1 and add its path to your Cargo.toml:
