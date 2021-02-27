@@ -16,10 +16,10 @@ Run `rhack edit`:
 $ rhack edit reqwest
 ```
 
-This will make a copy of the crate into $HOME/.rhack/reqwest-0.11.1 and add its path to your Cargo.toml:
+This will make a copy of the crate into $HOME/.rhack/reqwest-0.11.1 and add its path to the [[patch] section](https://doc.rust-lang.org/edition-guide/rust-2018/cargo-and-crates-io/replacing-dependencies-with-patch.html) in your Cargo.toml:
 
 ```toml
-[dependencies]
+[patch.crates-io]
 reqwest = { path = "/Users/nakabonne/.rhack/reqwest-0.11.1", version = "0.11" }
 ```
 
