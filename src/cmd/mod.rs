@@ -7,7 +7,7 @@ use clap::{AppSettings, Clap};
 pub use edit::Edit;
 pub use undo::Undo;
 
-const DEFAULT_RHACK_DIR_NAME: &str = "/Users/nakabonne/.rhack";
+const DEFAULT_RHACK_DIR_NAME: &str = ".rhack";
 
 pub trait Cmd {
     fn run(&self) -> Result<()>;
