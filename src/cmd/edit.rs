@@ -1,10 +1,13 @@
 use super::{Cmd, DEFAULT_RHACK_DIR_NAME};
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::process::Command;
 
 use anyhow::{anyhow, Result};
 use clap::Clap;
+use serde::Deserialize;
+use serde_json;
 
 /// Start hacking a crate
 #[derive(Clap, Debug)]
@@ -15,7 +18,7 @@ pub struct Edit {
 impl Cmd for Edit {
     fn run(&self) -> Result<()> {
         // Copy the crate in registry to the rhack directory.
-        let src = registry_path(&self.crate_name);
+        let src = registry_path(&self.crate_name)?;
         let home_dir = match home::home_dir() {
             Some(path) => path,
             None => return Err(anyhow!("failed to find home directory")),
@@ -27,11 +30,39 @@ impl Cmd for Edit {
     }
 }
 
-fn registry_path(crate_name: &str) -> PathBuf {
-    // FIXME: Find the crate directory under the cargo home. If no, maybe we have to do git clone.
-    return PathBuf::from(
-        "/Users/nakabonne/.cargo/registry/src/github.com-1ecc6299db9ec823/reqwest-0.11.1",
-    );
+#[derive(Deserialize)]
+struct Metadata {
+    packages: Vec<Package>,
+}
+
+#[derive(Deserialize)]
+struct Package {
+    name: String,
+    manifest_path: String,
+}
+
+// Gives back the local path to the directory holding the given crate.
+fn registry_path(crate_name: &str) -> Result<PathBuf> {
+    let out = Command::new("cargo").arg("metadata").output();
+    let out = match out {
+        Ok(o) => o,
+        Err(err) => return Err(anyhow!("failed to run \"cargo metadata\": {:#}", err)),
+    };
+    let metadata: Metadata = serde_json::from_slice(&out.stdout)?;
+
+    let mut packages = HashMap::new();
+    for p in metadata.packages {
+        packages.insert(p.name, p.manifest_path);
+    }
+    let manifest_path = match packages.get(crate_name) {
+        Some(m) => m,
+        None => return Err(anyhow!("the given crate is not used in this project")),
+    };
+    let manifest_path = PathBuf::from(manifest_path);
+    let path = manifest_path
+        .parent()
+        .expect("faild to determine the parent of manifest");
+    return Ok(path.to_path_buf());
 }
 
 // Copy the given src to the given dst. And then give back the path to newly created one.
@@ -39,6 +70,7 @@ fn copy_dir(src: PathBuf, dst: PathBuf) -> Result<PathBuf> {
     // FIXME: Mkdir if non-existence
 
     // TODO: Remove dependency on platform. Refer to gohack's implementation.
+    // Refer to: https://github.com/rogpeppe/gohack/blob/03d2ff3646b7ffc380e059413e4302f6cbdeb09b/io.go#L25-L47
     let out = Command::new("cp").arg("-rf").arg(src).arg(dst).output();
     match out {
         Ok(_) => {

@@ -30,3 +30,6 @@ Now your package uses the locally checked out copy instead of one from crates.io
 ```
 $ rhack undo reqwest
 ```
+
+## Inspired by
+- [gohack](https://github.com/rogpeppe/gohack)
