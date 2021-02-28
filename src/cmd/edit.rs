@@ -7,7 +7,7 @@ use std::process::Command;
 use anyhow::{anyhow, Result};
 use clap::Clap;
 use serde::Deserialize;
-use serde_json;
+use serde_json::Value;
 
 /// Start hacking a crate
 #[derive(Clap, Debug)]
@@ -26,23 +26,23 @@ impl Cmd for Edit {
         let dst = home_dir.join(DEFAULT_RHACK_DIR_NAME);
         let new_path = copy_dir(src, dst)?;
 
-        update_manifest(new_path)
+        update_manifest(&self.crate_name, new_path)
     }
-}
-
-#[derive(Deserialize)]
-struct Metadata {
-    packages: Vec<Package>,
-}
-
-#[derive(Deserialize)]
-struct Package {
-    name: String,
-    manifest_path: String,
 }
 
 // Gives back the local path to the directory holding the given crate.
 fn registry_path(crate_name: &str) -> Result<PathBuf> {
+    #[derive(Deserialize)]
+    struct Metadata {
+        packages: Vec<Package>,
+    }
+
+    #[derive(Deserialize)]
+    struct Package {
+        name: String,
+        manifest_path: String,
+    }
+
     let out = Command::new("cargo").arg("metadata").output();
     let out = match out {
         Ok(o) => o,
@@ -75,7 +75,7 @@ fn copy_dir(src: PathBuf, dst: PathBuf) -> Result<PathBuf> {
     match out {
         Ok(_) => {
             // FIXME: Give back the newly created one
-            let path = PathBuf::from("/Users/nakabonne/.rhack/reqwest-0.11.1");
+            let path = PathBuf::from("dummy");
             Ok(path)
         }
         Err(err) => Err(anyhow!("failed to run cp command: {:#}", err)),
@@ -83,7 +83,16 @@ fn copy_dir(src: PathBuf, dst: PathBuf) -> Result<PathBuf> {
 }
 
 //  Update [patch] section in Cargo.toml
-fn update_manifest(new_path: PathBuf) -> Result<()> {
+fn update_manifest(crate_name: &str, new_path: PathBuf) -> Result<()> {
+    let out = Command::new("cargo").arg("locate-project").output();
+    let out = match out {
+        Ok(o) => o,
+        Err(err) => return Err(anyhow!("failed to run \"cargo locate-project\": {:#}", err)),
+    };
+    let out: Value = serde_json::from_slice(&out.stdout)?;
+    let manifest_path = out["root"].as_str();
+
     // FIXME: Update [patch] section in Cargo.toml
+
     return Err(anyhow!("edit command is not implemented"));
 }

@@ -20,7 +20,7 @@ This will make a copy of the crate into `$HOME/.rhack/reqwest-0.11.1` and add it
 
 ```toml
 [patch.crates-io]
-reqwest = { path = "/Users/nakabonne/.rhack/reqwest-0.11.1", version = "0.11" }
+reqwest = { path = "/Users/nakabonne/.rhack/reqwest-0.11.1" }
 ```
 
 Now your package uses the locally checked out copy instead of one from crates.io. You can now put the `dbg!` macro or try to fix the bug!
