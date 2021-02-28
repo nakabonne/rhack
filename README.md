@@ -1,5 +1,7 @@
 # rhack
-Would you like to put a sneaky `dbg!` macro into external crates to find out how some internal data structure works? If so `rhack` is for you!
+Would you like to quickly put a sneaky `dbg!` macro into external crates to find out how some internal data structure works? If so `rhack` is for you!
+
+`rhack` makes it easier to edit external crates code that your project depends on.
 
 ## Usage
 
