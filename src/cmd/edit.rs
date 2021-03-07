@@ -1,7 +1,9 @@
-use super::{Cmd, DEFAULT_RHACK_DIR_NAME};
+use super::{Cmd, DEFAULT_RHACK_DIR_NAME, RHACK_DIR_ENV_KEY};
 
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::env;
+use std::fs;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use anyhow::{anyhow, Result};
@@ -13,20 +15,38 @@ use serde_json::Value;
 #[derive(Clap, Debug)]
 pub struct Edit {
     crate_name: String,
+
+    /// Verbose output.
+    #[clap(short, long)]
+    verbose: bool,
 }
 
 impl Cmd for Edit {
     fn run(&self) -> Result<()> {
-        // Copy the crate in registry to the rhack directory.
+        // Determine the destination directory and the source directory.
         let src = registry_path(&self.crate_name)?;
-        let home_dir = match home::home_dir() {
-            Some(path) => path,
-            None => return Err(anyhow!("failed to find home directory")),
+        let mut dst = PathBuf::from(src.file_name().unwrap());
+        match env::var(RHACK_DIR_ENV_KEY) {
+            Ok(v) => {
+                dst = PathBuf::from(v).join(dst);
+            }
+            Err(err) => {
+                let home_dir = match home::home_dir() {
+                    Some(path) => path,
+                    None => return Err(anyhow!("failed to find home directory: {}", err)),
+                };
+                dst = home_dir.join(DEFAULT_RHACK_DIR_NAME).join(dst);
+            }
         };
-        let dst = home_dir.join(DEFAULT_RHACK_DIR_NAME);
-        let new_path = copy_dir(src, dst)?;
 
-        update_manifest(&self.crate_name, new_path)
+        match copy_dir(&src, &dst) {
+            Ok(_) => (),
+            Err(err) => return Err(anyhow!("failed to copy {:?} to {:?}: {}", src, dst, err)),
+        }
+
+        update_manifest(&self.crate_name, &dst)?;
+        println!("{:?} => {:?}", &self.crate_name, dst);
+        Ok(())
     }
 }
 
@@ -65,25 +85,60 @@ fn registry_path(crate_name: &str) -> Result<PathBuf> {
     return Ok(path.to_path_buf());
 }
 
-// Copy the given src to the given dst. And then give back the path to newly created one.
-fn copy_dir(src: PathBuf, dst: PathBuf) -> Result<PathBuf> {
-    // FIXME: Mkdir if non-existence
+// Copy the given src to the given dst recursively.
+fn copy_dir<U: AsRef<Path>, V: AsRef<Path>>(from: U, to: V) -> Result<(), std::io::Error> {
+    let mut stack = Vec::new();
+    stack.push(PathBuf::from(from.as_ref()));
 
-    // TODO: Remove dependency on platform. Refer to gohack's implementation.
-    // Refer to: https://github.com/rogpeppe/gohack/blob/03d2ff3646b7ffc380e059413e4302f6cbdeb09b/io.go#L25-L47
-    let out = Command::new("cp").arg("-rf").arg(src).arg(dst).output();
-    match out {
-        Ok(_) => {
-            // FIXME: Give back the newly created one
-            let path = PathBuf::from("dummy");
-            Ok(path)
+    let output_root = PathBuf::from(to.as_ref());
+    let input_root = PathBuf::from(from.as_ref()).components().count();
+
+    while let Some(working_path) = stack.pop() {
+        // FIXME: emit only in verbose mode
+        println!("");
+        println!("process: {:?}", &working_path);
+
+        // Generate a relative path
+        let src: PathBuf = working_path.components().skip(input_root).collect();
+
+        // Create a destination if missing
+        let dest = if src.components().count() == 0 {
+            output_root.clone()
+        } else {
+            output_root.join(&src)
+        };
+        if fs::metadata(&dest).is_err() {
+            println!("  mkdir: {:?}", dest);
+            fs::create_dir_all(&dest)?;
         }
-        Err(err) => Err(anyhow!("failed to run cp command: {:#}", err)),
+
+        for entry in fs::read_dir(working_path)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_dir() {
+                stack.push(path);
+            } else {
+                match path.file_name() {
+                    Some(filename) => {
+                        let dest_path = dest.join(filename);
+                        println!("    copy: {:?} -> {:?}", &path, &dest_path);
+                        fs::copy(&path, &dest_path)?;
+                    }
+                    None => {
+                        println!("failed: {:?}", path);
+                    }
+                }
+            }
+        }
     }
+
+    Ok(())
 }
 
 //  Update [patch] section in Cargo.toml
-fn update_manifest(crate_name: &str, new_path: PathBuf) -> Result<()> {
+fn update_manifest(crate_name: &str, new_path: &PathBuf) -> Result<()> {
+    // Run "cargo locate-project" to find out Cargo.toml file's location.
+    // See: https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html
     let out = Command::new("cargo").arg("locate-project").output();
     let out = match out {
         Ok(o) => o,
@@ -93,6 +148,7 @@ fn update_manifest(crate_name: &str, new_path: PathBuf) -> Result<()> {
     let manifest_path = out["root"].as_str();
 
     // FIXME: Update [patch] section in Cargo.toml
+    // FIXME: Consider using [patch.rhack] instead of [patch.crates-io]
 
     return Err(anyhow!("edit command is not implemented"));
 }

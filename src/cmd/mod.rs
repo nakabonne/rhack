@@ -8,6 +8,7 @@ pub use edit::Edit;
 pub use undo::Undo;
 
 const DEFAULT_RHACK_DIR_NAME: &str = ".rhack";
+const RHACK_DIR_ENV_KEY: &str = "RHACK_DIR";
 
 pub trait Cmd {
     fn run(&self) -> Result<()>;
