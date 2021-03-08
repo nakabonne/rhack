@@ -135,7 +135,7 @@ fn copy_dir<U: AsRef<Path>, V: AsRef<Path>>(from: U, to: V) -> Result<(), std::i
     Ok(())
 }
 
-//  Update [patch] section in Cargo.toml
+//  Update [patch.'https://github.com/nakabonne/rhack'] section in Cargo.toml
 fn update_manifest(crate_name: &str, new_path: &PathBuf) -> Result<()> {
     // Run "cargo locate-project" to find out Cargo.toml file's location.
     // See: https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html
@@ -147,8 +147,8 @@ fn update_manifest(crate_name: &str, new_path: &PathBuf) -> Result<()> {
     let out: Value = serde_json::from_slice(&out.stdout)?;
     let manifest_path = out["root"].as_str();
 
-    // FIXME: Update [patch] section in Cargo.toml
-    // FIXME: Consider using [patch.rhack] instead of [patch.crates-io]
+    // FIXME: Update [patch.'https://github.com/nakabonne/rhack'] section in Cargo.toml
+    // Using https://github.com/alexcrichton/toml-rs
 
     return Err(anyhow!("edit command is not implemented"));
 }
