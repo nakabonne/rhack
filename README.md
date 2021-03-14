@@ -20,11 +20,11 @@ $ rhack edit reqwest
 This will make a copy of the crate into `$HOME/.rhack/reqwest-0.11.1` and add its path to the [[patch] section](https://doc.rust-lang.org/edition-guide/rust-2018/cargo-and-crates-io/replacing-dependencies-with-patch.html) in your Cargo.toml whose path is automatically detected:
 
 ```toml
-[patch.'https://github.com/nakabonne/rhack']
+[patch.crates-io]
 reqwest = { path = "/home/you/.rhack/reqwest-0.11.1" }
 ```
 
-Now your package uses the locally checked out copy instead of one from crates.io. You can now open the files (typically by jumping to definition) and then feel free to modify the source code.
+Now your package uses the locally checked out copy instead of one from crates.io. You can now open the files (typically by leveraging the "Jump to Definition" feature) and then feel free to modify the source code.
 
 ### Undoing
 
@@ -35,5 +35,5 @@ $ rhack undo reqwest
 ### Settings
 It uses `$HOME/.rhack` as the destination to copy the source code of the external crates by default. You can change it by setting and exposing the `$RHACK_DIR` environment variable.
 
-## Inspired by
-- [gohack](https://github.com/rogpeppe/gohack)
+## Acknowledgements
+This tool is highly inspired by [gohack](https://github.com/rogpeppe/gohack). It clearly stimulated an incentive to creation. A big "thank you!" goes out to them.

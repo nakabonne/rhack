@@ -1,4 +1,6 @@
-use super::{Cmd, DEFAULT_RHACK_DIR_NAME, PATCH_TABLE_NAME, RHACK_DIR_ENV_KEY};
+use super::{
+    Cmd, DEFAULT_RHACK_DIR_NAME, PATCH_TABLE_NAME, REGISTRY_TABLE_NAME, RHACK_DIR_ENV_KEY,
+};
 
 use std::collections::HashMap;
 use std::env;
@@ -10,7 +12,7 @@ use anyhow::{anyhow, Result};
 use clap::Clap;
 use serde::Deserialize;
 use serde_json::Value;
-use toml_edit::{table, value, Document};
+use toml_edit::{value, Document, Item, Table};
 
 /// Start hacking a crate
 #[derive(Clap, Debug)]
@@ -139,7 +141,7 @@ impl Edit {
         Ok(())
     }
 
-    //  Update [patch.'https://github.com/nakabonne/rhack'] section in Cargo.toml
+    //  Update [patch.crates-io] section in Cargo.toml
     fn update_manifest(&self, new_path: &PathBuf) -> Result<()> {
         // Run "cargo locate-project" to find out Cargo.toml file's location.
         // See: https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html
@@ -153,20 +155,29 @@ impl Edit {
 
         let manifest = match fs::read_to_string(&manifest_path) {
             Ok(b) => b,
-            Err(err) => return Err(anyhow!("failed to read {}: {:#}", &manifest_path, err)),
+            Err(err) => return Err(anyhow!("failed to read from {}: {:#}", &manifest_path, err)),
         };
         let mut manifest = match manifest.parse::<Document>() {
             Ok(m) => m,
             Err(err) => return Err(anyhow!("failed to parse {}: {:#}", &manifest_path, err)),
         };
-        if !manifest.as_table().contains_table(PATCH_TABLE_NAME) {
-            manifest[PATCH_TABLE_NAME] = table();
-        }
-        manifest[PATCH_TABLE_NAME][&self.crate_name]["path"] = value(new_path.to_str().unwrap());
-        println!("{}", manifest.to_string_in_original_order());
-        // FIXME: Update [patch.'https://github.com/nakabonne/rhack'] section in Cargo.toml
 
-        return Err(anyhow!("edit command is not implemented"));
+        // Insert [patch.crates-io] table if it doesn't exist.
+        if let Item::None = manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME] {
+            let mut t = Table::new();
+            t.set_implicit(true);
+            manifest[PATCH_TABLE_NAME] = Item::Table(t);
+            manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME] = Item::Table(Table::new());
+        }
+        manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME][&self.crate_name]["path"] =
+            value(new_path.to_str().unwrap());
+
+        match fs::write(&manifest_path, manifest.to_string_in_original_order()) {
+            Ok(_) => (),
+            Err(err) => return Err(anyhow!("failed to write to {}: {:#}", &manifest_path, err)),
+        }
+
+        return Ok(());
     }
 
     fn debug(&self, msg: &str) {
