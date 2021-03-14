@@ -1,4 +1,4 @@
-use super::{Cmd, DEFAULT_RHACK_DIR_NAME, RHACK_DIR_ENV_KEY};
+use super::{Cmd, DEFAULT_RHACK_DIR_NAME, PATCH_TABLE_NAME, RHACK_DIR_ENV_KEY};
 
 use std::collections::HashMap;
 use std::env;
@@ -10,6 +10,7 @@ use anyhow::{anyhow, Result};
 use clap::Clap;
 use serde::Deserialize;
 use serde_json::Value;
+use toml_edit::{table, value, Document, Item, Table};
 
 /// Start hacking a crate
 #[derive(Clap, Debug)]
@@ -44,9 +45,41 @@ impl Cmd for Edit {
             Err(err) => return Err(anyhow!("failed to copy {:?} to {:?}: {}", src, dst, err)),
         }
 
-        update_manifest(&self.crate_name, &dst)?;
+        self.update_manifest(&dst)?;
         println!("{:?} => {:?}", &self.crate_name, dst);
         Ok(())
+    }
+}
+
+impl Edit {
+    //  Update [patch.'https://github.com/nakabonne/rhack'] section in Cargo.toml
+    fn update_manifest(&self, new_path: &PathBuf) -> Result<()> {
+        // Run "cargo locate-project" to find out Cargo.toml file's location.
+        // See: https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html
+        let out = Command::new("cargo").arg("locate-project").output();
+        let out = match out {
+            Ok(o) => o,
+            Err(err) => return Err(anyhow!("failed to run \"cargo locate-project\": {:#}", err)),
+        };
+        let out: Value = serde_json::from_slice(&out.stdout)?;
+        let manifest_path = out["root"].as_str().unwrap();
+
+        let manifest = match fs::read_to_string(&manifest_path) {
+            Ok(b) => b,
+            Err(err) => return Err(anyhow!("failed to read {}: {:#}", &manifest_path, err)),
+        };
+        let mut manifest = match manifest.parse::<Document>() {
+            Ok(m) => m,
+            Err(err) => return Err(anyhow!("failed to parse {}: {:#}", &manifest_path, err)),
+        };
+        if !manifest.as_table().contains_table(PATCH_TABLE_NAME) {
+            manifest[PATCH_TABLE_NAME] = table();
+        }
+        manifest[PATCH_TABLE_NAME][&self.crate_name]["path"] = value(new_path.to_str().unwrap());
+        println!("{}", manifest.to_string_in_original_order());
+        // FIXME: Update [patch.'https://github.com/nakabonne/rhack'] section in Cargo.toml
+
+        return Err(anyhow!("edit command is not implemented"));
     }
 }
 
@@ -133,22 +166,4 @@ fn copy_dir<U: AsRef<Path>, V: AsRef<Path>>(from: U, to: V) -> Result<(), std::i
     }
 
     Ok(())
-}
-
-//  Update [patch.'https://github.com/nakabonne/rhack'] section in Cargo.toml
-fn update_manifest(crate_name: &str, new_path: &PathBuf) -> Result<()> {
-    // Run "cargo locate-project" to find out Cargo.toml file's location.
-    // See: https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html
-    let out = Command::new("cargo").arg("locate-project").output();
-    let out = match out {
-        Ok(o) => o,
-        Err(err) => return Err(anyhow!("failed to run \"cargo locate-project\": {:#}", err)),
-    };
-    let out: Value = serde_json::from_slice(&out.stdout)?;
-    let manifest_path = out["root"].as_str();
-
-    // FIXME: Update [patch.'https://github.com/nakabonne/rhack'] section in Cargo.toml
-    // Using https://github.com/alexcrichton/toml-rs
-
-    return Err(anyhow!("edit command is not implemented"));
 }

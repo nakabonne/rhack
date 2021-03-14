@@ -9,6 +9,7 @@ pub use undo::Undo;
 
 const DEFAULT_RHACK_DIR_NAME: &str = ".rhack";
 const RHACK_DIR_ENV_KEY: &str = "RHACK_DIR";
+const PATCH_TABLE_NAME: &str = "patch.'https://github.com/nakabonne/rhack'";
 
 pub trait Cmd {
     fn run(&self) -> Result<()>;
