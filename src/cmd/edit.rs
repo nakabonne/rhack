@@ -98,6 +98,7 @@ impl Edit {
         let mut stack = Vec::new();
         stack.push(PathBuf::from(from.as_ref()));
 
+        // TODO: Delete dir if the destination dir already exists.
         let output_root = PathBuf::from(to.as_ref());
         let input_root = PathBuf::from(from.as_ref()).components().count();
 
