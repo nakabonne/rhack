@@ -71,7 +71,10 @@ pub fn manifest_path() -> Result<String> {
         Err(err) => return Err(anyhow!("failed to run \"cargo locate-project\": {:#}", err)),
     };
     let out: Value = serde_json::from_slice(&out.stdout)?;
-    let path = out["root"].as_str().unwrap();
+    let path = match out["root"].as_str() {
+        Some(p) => p,
+        None => return Err(anyhow!("unexpected response from \"cargo locate-project\"")),
+    };
     return Ok(path.to_string());
 }
 
