@@ -1,9 +1,6 @@
-use super::{
-    Cmd, DEFAULT_RHACK_DIR_NAME, PATCH_TABLE_NAME, REGISTRY_TABLE_NAME, RHACK_DIR_ENV_KEY,
-};
+use super::{load_manifest, manifest_path, rhack_dir, Cmd, PATCH_TABLE_NAME, REGISTRY_TABLE_NAME};
 
 use std::collections::HashMap;
-use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -11,8 +8,7 @@ use std::process::Command;
 use anyhow::{anyhow, Result};
 use clap::Clap;
 use serde::Deserialize;
-use serde_json::Value;
-use toml_edit::{value, Document, Item, Table};
+use toml_edit::{value, Item, Table};
 
 /// Start hacking a crate
 #[derive(Clap, Debug)]
@@ -29,18 +25,7 @@ impl Cmd for Edit {
         // Determine the destination directory and the source directory.
         let src = self.crate_local_path()?;
         let mut dst = PathBuf::from(src.file_name().unwrap());
-        match env::var(RHACK_DIR_ENV_KEY) {
-            Ok(v) => {
-                dst = PathBuf::from(v).join(dst);
-            }
-            Err(err) => {
-                let home_dir = match home::home_dir() {
-                    Some(path) => path,
-                    None => return Err(anyhow!("failed to find home directory: {}", err)),
-                };
-                dst = home_dir.join(DEFAULT_RHACK_DIR_NAME).join(dst);
-            }
-        };
+        dst = rhack_dir().join(dst);
 
         match self.copy_dir(&src, &dst) {
             Ok(_) => (),
@@ -144,23 +129,13 @@ impl Edit {
 
     //  Update [patch.crates-io] section in Cargo.toml
     fn update_manifest(&self, new_path: &PathBuf) -> Result<()> {
-        // Run "cargo locate-project" to find out Cargo.toml file's location.
-        // See: https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html
-        let out = Command::new("cargo").arg("locate-project").output();
-        let out = match out {
-            Ok(o) => o,
-            Err(err) => return Err(anyhow!("failed to run \"cargo locate-project\": {:#}", err)),
+        let manifest_path = match manifest_path() {
+            Ok(p) => p,
+            Err(err) => return Err(err),
         };
-        let out: Value = serde_json::from_slice(&out.stdout)?;
-        let manifest_path = out["root"].as_str().unwrap();
-
-        let manifest = match fs::read_to_string(&manifest_path) {
-            Ok(b) => b,
-            Err(err) => return Err(anyhow!("failed to read from {}: {:#}", &manifest_path, err)),
-        };
-        let mut manifest = match manifest.parse::<Document>() {
+        let mut manifest = match load_manifest(&manifest_path) {
             Ok(m) => m,
-            Err(err) => return Err(anyhow!("failed to parse {}: {:#}", &manifest_path, err)),
+            Err(err) => return Err(err),
         };
 
         // Insert [patch.crates-io] table if it doesn't exist.

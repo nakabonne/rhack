@@ -27,10 +27,13 @@ reqwest = { path = "/home/you/.rhack/reqwest-0.11.1" }
 Now your package uses the locally checked out copy instead of one from crates.io. You can now open the files (typically by leveraging the "Jump to Definition" feature) and then feel free to modify the source code.
 
 ### Undoing
+Simply run the `undo` command then you can undo all of the changes to your Cargo.toml:
 
 ```
-$ rhack undo reqwest
+$ rhack undo
 ```
+
+Keep in mind that this command doesn't remove any copy of crates.
 
 ### Settings
 It uses `$HOME/.rhack` as the destination to copy the source code of the external crates by default. You can change it by setting and exposing the `$RHACK_DIR` environment variable.
