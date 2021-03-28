@@ -1,6 +1,7 @@
 use super::{load_manifest, manifest_path, rhack_dir, Cmd, PATCH_TABLE_NAME, REGISTRY_TABLE_NAME};
 
 use std::fs;
+use std::path::PathBuf;
 
 use anyhow::{anyhow, Result};
 use clap::Clap;
@@ -20,7 +21,7 @@ impl Cmd for Undo {
             Ok(p) => p,
             Err(err) => return Err(err),
         };
-        let mut manifest = match load_manifest(&manifest_path) {
+        let manifest = match load_manifest(&manifest_path) {
             Ok(m) => m,
             Err(err) => return Err(err),
         };
@@ -30,14 +31,30 @@ impl Cmd for Undo {
             return Ok(());
         }
 
-        let table = &manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME]
+        let table = manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME]
             .as_table()
             .unwrap();
 
+        let mut removed_crates = Vec::new();
         for item in table.iter() {
-            // FIXME: Remove from the table if the path is underneath the rhack directory.
-            // Using https://docs.rs/toml_edit/0.2.0/toml_edit/struct.Table.html#method.remove
-            println!("{:?}", item);
+            let path = item.1["path"].as_value().unwrap().as_str().unwrap();
+            let path = PathBuf::from(path);
+            if path.starts_with(rhack_dir()) {
+                removed_crates.push(item.0)
+            }
+        }
+
+        // NOTE: To avoid being mutable borrow even though borrwoed as immutable once.
+        let mut manifest = load_manifest(&manifest_path).unwrap();
+        let table = manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME]
+            .as_table_mut()
+            .unwrap();
+        for c in removed_crates {
+            println!("dropped {:?}", c);
+            table.remove(c);
+        }
+        if table.is_empty() {
+            table.set_implicit(true);
         }
 
         match fs::write(&manifest_path, manifest.to_string_in_original_order()) {
