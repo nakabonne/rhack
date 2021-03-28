@@ -28,7 +28,7 @@ jobs:
         run: |
           strip target/release/rhack
           mkdir -p release
-          tar -C ./target/release/ -czvf ./release/rhack-mac.tar.gz ./rhack
+          tar -C ./target/release/ -czvf ./release/rhack_darwin_amd64.tar.gz ./rhack
 
       - name: Build for Linux
         if: matrix.os == 'ubuntu-latest'
@@ -38,13 +38,13 @@ jobs:
           strip target/release/rhack
           mkdir -p release
           mv target/debian/*.deb ./release/rhack-linux.deb
-          tar -C ./target/release/ -czvf ./release/rhack-linux.tar.gz ./rhack
+          tar -C ./target/release/ -czvf ./release/rhack_linux_amd64.tar.gz ./rhack
 
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
         run: |
           mkdir -p release
-          tar -C ./target/release/ -czvf ./release/rhack-win.tar.gz ./rhack.exe
+          tar -C ./target/release/ -czvf ./release/rhack_win_amd64.tar.gz ./rhack.exe
 
       - name: Release
         uses: softprops/action-gh-release@v1
