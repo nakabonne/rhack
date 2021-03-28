@@ -37,7 +37,7 @@ jobs:
           cargo deb
           strip target/release/rhack
           mkdir -p release
-          mv target/debian/*.deb ./release/rhack-linux.deb
+          mv target/debian/*.deb ./release/rhack_linux_amd64.deb
           tar -C ./target/release/ -czvf ./release/rhack_linux_amd64.tar.gz ./rhack
 
       - name: Build for Windows
