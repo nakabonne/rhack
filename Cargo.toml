@@ -3,6 +3,13 @@ name = "rhack"
 version = "0.1.0"
 authors = ["nakabonne <ryo@nakao.dev>"]
 edition = "2018"
+license-file = "LICENSE"
+description = "Temporary edits to your Rust dependencies"
+readme = "README.md"
+homepage = "https://github.com/nakabonne/rhack"
+repository = "https://github.com/nakabonne/rhack"
+keywords = ["cli", "cargo", "dependency", "crate"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0"
