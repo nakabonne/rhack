@@ -1,4 +1,6 @@
 # rhack
+[![Version info](https://img.shields.io/crates/v/rhack.svg)](https://crates.io/crates/rhack)
+
 You want to quickly put a sneaky macro kind of like `dbg!` into external crates to find out how some internal data structure works? If so `rhack` is for you!
 
 `rhack` makes it easier to edit external crates code that your project depends on.
@@ -35,8 +37,25 @@ $ rhack undo
 
 Keep in mind that this command doesn't remove any copy of crates.
 
+
 ### Settings
 It uses `$HOME/.rhack` as the destination to copy the source code of the external crates by default. You can change it by setting and exposing the `$RHACK_DIR` environment variable.
+
+## Installation
+For MacOS, Linux, and Windows, prebuilt binaries are available through [here](https://github.com/nakabonne/rhack/releases).
+
+### Debian/Ubuntu
+
+```
+wget https://github.com/nakabonne/rhack/releases/download/v0.1.0/rhack_linux_amd64.deb
+apt install ./rhack_linux_amd64.deb
+```
+
+### Cargo
+
+```
+cargo install rhack
+```
 
 ## Acknowledgements
 This tool is highly inspired by [gohack](https://github.com/rogpeppe/gohack). It clearly stimulated an incentive to creation. A big "thank you!" goes out to them.
