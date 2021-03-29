@@ -55,28 +55,31 @@ apt install ./rhack_linux_amd64.deb
 An [AUR package](https://aur.archlinux.org/packages/rhack/) is available.
 
 ```
-» yay rhack
-  aur/rhack 0.1.0-1 (+0 0.00)
-    rhack - easily hack on your Rust dependencies
-```
-
-### Other Linux
-You will need `scdoc` installed in order to generate the manpage.
-```
-make all
-sudo make install
-```
-
-You can pass `PREFIX` or `DESTDIR` to control the installation destination:
-```
-sudo make PREFIX=$HOME/.local/ install
+yay rhack
 ```
 
 ### Cargo
-If you just want a local install, and you don't need the manpage, you can install to `$HOME/.cargo` by running:
+
 ```
 cargo install rhack
 ```
+
+### From source
+
+```
+git clone https://github.com/nakabonne/rhack.git
+cargo build --release
+sudo install -m755 target/release/rhack /usr/local/bin/rhack
+```
+
+If you want to generate the man page, you can install it with `scdoc`.
+
+```
+sudo mkdir -p /usr/local/share/man/man1
+scdoc < rhack.1.scd > rhack.1
+sudo install -m644 rhack.1 /usr/local/share/man/man1/rhack.1
+```
+
 
 ## Acknowledgements
 This tool is highly inspired by [gohack](https://github.com/rogpeppe/gohack). It clearly stimulated an incentive to creation. A big "thank you!" goes out to them.
