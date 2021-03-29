@@ -27,6 +27,7 @@ pub trait Cmd {
 #[clap(
     about,
     author,
+    global_setting(AppSettings::ColoredHelp)
     global_setting(AppSettings::GlobalVersion),
     global_setting(AppSettings::VersionlessSubcommands),
     version = "0.1.0"
