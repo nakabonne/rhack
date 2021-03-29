@@ -60,8 +60,20 @@ An [AUR package](https://aur.archlinux.org/packages/rhack/) is available.
     rhack - easily hack on your Rust dependencies
 ```
 
-### Cargo
+### Other Linux
+You will need `scdoc` installed in order to generate the manpage.
+```
+make all
+sudo make install
+```
 
+You can pass `PREFIX` or `DESTDIR` to control the installation destination:
+```
+sudo make PREFIX=$HOME/.local/ install
+```
+
+### Cargo
+If you just want a local install, and you don't need the manpage, you can install to `$HOME/.cargo` by running:
 ```
 cargo install rhack
 ```
