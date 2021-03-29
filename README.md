@@ -51,6 +51,15 @@ wget https://github.com/nakabonne/rhack/releases/download/v0.1.0/rhack_linux_amd
 apt install ./rhack_linux_amd64.deb
 ```
 
+### Arch Linux
+An [AUR package](https://aur.archlinux.org/packages/rhack/) is available.
+
+```
+» yay rhack
+  aur/rhack 0.1.0-1 (+0 0.00)
+    rhack - easily hack on your Rust dependencies
+```
+
 ### Cargo
 
 ```
