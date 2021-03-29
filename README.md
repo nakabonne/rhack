@@ -51,8 +51,29 @@ wget https://github.com/nakabonne/rhack/releases/download/v0.1.0/rhack_linux_amd
 apt install ./rhack_linux_amd64.deb
 ```
 
-### Cargo
+### Arch Linux
+An [AUR package](https://aur.archlinux.org/packages/rhack/) is available.
 
+```
+» yay rhack
+  aur/rhack 0.1.0-1 (+0 0.00)
+    rhack - easily hack on your Rust dependencies
+```
+
+### Other Linux
+You will need `scdoc` installed in order to generate the manpage.
+```
+make all
+sudo make install
+```
+
+You can pass `PREFIX` or `DESTDIR` to control the installation destination:
+```
+sudo make PREFIX=$HOME/.local/ install
+```
+
+### Cargo
+If you just want a local install, and you don't need the manpage, you can install to `$HOME/.cargo` by running:
 ```
 cargo install rhack
 ```
