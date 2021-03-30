@@ -66,7 +66,11 @@ pub fn rhack_dir() -> PathBuf {
 pub fn manifest_path() -> Result<String> {
     // Run "cargo locate-project" to find out Cargo.toml file's location.
     // See: https://doc.rust-lang.org/cargo/commands/cargo-locate-project.html
-    let out = Command::new("cargo").arg("locate-project").output();
+    let out = Command::new("cargo")
+        .arg("locate-project")
+        .arg("--workspace")
+        .output();
+
     let out = match out {
         Ok(o) => o,
         Err(err) => return Err(anyhow!("failed to run \"cargo locate-project\": {:#}", err)),
