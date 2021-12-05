@@ -6,12 +6,12 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use anyhow::{anyhow, Result};
-use clap::Clap;
+use clap::Parser;
 use serde::Deserialize;
 use toml_edit::{value, Item, Table};
 
 /// Start hacking a crate
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 pub struct Edit {
     crate_name: String,
 

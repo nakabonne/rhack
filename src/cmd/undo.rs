@@ -4,11 +4,11 @@ use std::fs;
 use std::path::PathBuf;
 
 use anyhow::{anyhow, Result};
-use clap::Clap;
+use clap::Parser;
 use toml_edit::Item;
 
 /// Undo everything
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 pub struct Undo {
     /// Verbose output.
     #[clap(short, long)]

@@ -4,7 +4,7 @@ mod error;
 use crate::cmd::{App, Cmd};
 use crate::error::SilentExit;
 
-use clap::Clap;
+use clap::Parser;
 
 use std::io::{self, Write};
 use std::process;

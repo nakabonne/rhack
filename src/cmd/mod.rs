@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 use anyhow::{anyhow, Result};
-use clap::{AppSettings, Clap};
+use clap::{AppSettings, Parser};
 use serde_json::Value;
 use toml_edit::Document;
 
@@ -23,13 +23,11 @@ pub trait Cmd {
     fn run(&self) -> Result<()>;
 }
 
-#[derive(Debug, Clap)]
+#[derive(Debug, Parser)]
 #[clap(
     about,
     author,
-    global_setting(AppSettings::ColoredHelp),
-    global_setting(AppSettings::GlobalVersion),
-    global_setting(AppSettings::VersionlessSubcommands),
+    global_setting(AppSettings::PropagateVersion),
     version = "0.1.0"
 )]
 pub enum App {
