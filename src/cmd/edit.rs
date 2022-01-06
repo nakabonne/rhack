@@ -71,7 +71,7 @@ impl Edit {
         let path = manifest_path
             .parent()
             .expect("faild to determine the parent of manifest");
-        return Ok(path.to_path_buf());
+        Ok(path.to_path_buf())
     }
 
     // Copy the given src to the given dst recursively.
@@ -80,8 +80,7 @@ impl Edit {
         from: U,
         to: V,
     ) -> Result<(), std::io::Error> {
-        let mut stack = Vec::new();
-        stack.push(PathBuf::from(from.as_ref()));
+        let mut stack = vec![PathBuf::from(from.as_ref())];
 
         // TODO: Delete dir if the destination dir already exists.
         let output_root = PathBuf::from(to.as_ref());
@@ -128,7 +127,7 @@ impl Edit {
     }
 
     //  Update [patch.crates-io] section in Cargo.toml
-    fn update_manifest(&self, new_path: &PathBuf) -> Result<()> {
+    fn update_manifest(&self, new_path: &Path) -> Result<()> {
         let manifest_path = match manifest_path() {
             Ok(p) => p,
             Err(err) => return Err(err),
@@ -148,12 +147,12 @@ impl Edit {
         manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME][&self.crate_name]["path"] =
             value(new_path.to_str().unwrap());
 
-        match fs::write(&manifest_path, manifest.to_string_in_original_order()) {
+        match fs::write(&manifest_path, manifest.to_string()) {
             Ok(_) => (),
             Err(err) => return Err(anyhow!("failed to write to {}: {:#}", &manifest_path, err)),
         }
 
-        return Ok(());
+        Ok(())
     }
 
     fn debug(&self, msg: &str) {

@@ -47,17 +47,15 @@ impl Cmd for App {
 // Gives back user-difined rhack dir path. If none, the default will be given.
 pub fn rhack_dir() -> PathBuf {
     match env::var(RHACK_DIR_ENV_KEY) {
-        Ok(path) => {
-            return PathBuf::from(path);
-        }
+        Ok(path) => PathBuf::from(path),
         Err(_) => {
             let home_dir = match home::home_dir() {
                 Some(path) => path,
                 None => panic!("failed to find home directory"),
             };
-            return home_dir.join(DEFAULT_RHACK_DIR_NAME);
+            home_dir.join(DEFAULT_RHACK_DIR_NAME)
         }
-    };
+    }
 }
 
 // Gives back the the path to Cargo.toml reffered from the working directory.
@@ -78,7 +76,7 @@ pub fn manifest_path() -> Result<String> {
         Some(p) => p,
         None => return Err(anyhow!("unexpected response from \"cargo locate-project\"")),
     };
-    return Ok(path.to_string());
+    Ok(path.to_string())
 }
 
 // Gives back the parsed Cargo.toml placed at the working directory.
@@ -87,8 +85,8 @@ pub fn load_manifest(manifest_path: &str) -> Result<Document> {
         Ok(b) => b,
         Err(err) => return Err(anyhow!("failed to read from {}: {:#}", &manifest_path, err)),
     };
-    return match manifest.parse::<Document>() {
+    match manifest.parse::<Document>() {
         Ok(m) => Ok(m),
         Err(err) => Err(anyhow!("failed to parse {}: {:#}", &manifest_path, err)),
-    };
+    }
 }

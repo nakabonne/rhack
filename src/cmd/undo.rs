@@ -57,12 +57,12 @@ impl Cmd for Undo {
             table.set_implicit(true);
         }
 
-        match fs::write(&manifest_path, manifest.to_string_in_original_order()) {
+        match fs::write(&manifest_path, manifest.to_string()) {
             Ok(_) => (),
             Err(err) => return Err(anyhow!("failed to write to {}: {:#}", &manifest_path, err)),
         }
 
-        return Ok(());
+        Ok(())
     }
 }
 
