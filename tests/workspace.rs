@@ -39,7 +39,7 @@ fn test_workspace_patching_passes() -> TestResult<()> {
         .current_dir(fixture_path.canonicalize()?)
         .spawn()?;
 
-    // TODO: Test other conditions, e.g. if the directory has been created etc.
-    // for now it panics if patch section can't be created
+    // TODO: Test other conditions, e.g. if the directory has removed
+    // diff against fixtures
     Ok(())
 }
