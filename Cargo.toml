@@ -1,8 +1,8 @@
 [package]
 name = "rhack"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["nakabonne <ryo@nakao.dev>"]
-edition = "2018"
+edition = "2021"
 license-file = "LICENSE"
 description = "Temporary edits to your Rust dependencies"
 readme = "README.md"
@@ -12,9 +12,9 @@ keywords = ["cli", "cargo", "dependency", "crate"]
 categories = ["command-line-utilities"]
 
 [dependencies]
-anyhow = "1.0.52"
-clap = { version = "3.0.5", features = ["derive", "color"] }
-home = "0.5.3"
-serde_json = "1.0.74"
-serde = { version = "1.0.133", features = ["derive"] }
-toml_edit = "0.12.3"
+anyhow = "1.0.71"
+clap = { version = "4.3.0", features = ["derive", "color"] }
+home = "0.5.5"
+serde_json = "1.0.96"
+serde = { version = "1.0.163", features = ["derive"] }
+toml_edit = "0.19.9"

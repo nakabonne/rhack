@@ -1,8 +1,5 @@
-mod cmd;
-mod error;
-
-use crate::cmd::{App, Cmd};
-use crate::error::SilentExit;
+use rhack::cmd::{App, Cmd};
+use rhack::error::SilentExit;
 
 use clap::Parser;
 

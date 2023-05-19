@@ -63,10 +63,11 @@ impl Edit {
         for p in metadata.packages {
             packages.insert(p.name, p.manifest_path);
         }
-        let manifest_path = match packages.get(&self.crate_name) {
-            Some(m) => m,
-            None => return Err(anyhow!("the given crate is not used in this project")),
+
+        let Some(manifest_path) = packages.get(&self.crate_name) else {
+            return Err(anyhow!("the given crate is not used in this project"))
         };
+
         let manifest_path = PathBuf::from(manifest_path);
         let path = manifest_path
             .parent()
@@ -99,7 +100,7 @@ impl Edit {
                 output_root.join(&src)
             };
             if fs::metadata(&dest).is_err() {
-                self.debug(&format!("  mkdir: {:?}", dest));
+                self.debug(&format!("  mkdir: {dest:?}"));
                 fs::create_dir_all(&dest)?;
             }
 
@@ -116,7 +117,7 @@ impl Edit {
                             fs::copy(&path, &dest_path)?;
                         }
                         None => {
-                            println!("failed to copy: {:?}", path);
+                            println!("failed to copy: {path:?}");
                         }
                     }
                 }
@@ -138,7 +139,7 @@ impl Edit {
         };
 
         // Insert [patch.crates-io] table if it doesn't exist.
-        if let Item::None = manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME] {
+        if matches!(manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME], Item::None) {
             let mut t = Table::new();
             t.set_implicit(true);
             manifest[PATCH_TABLE_NAME] = Item::Table(t);
@@ -157,7 +158,7 @@ impl Edit {
 
     fn debug(&self, msg: &str) {
         if self.verbose {
-            println!("{}", msg);
+            println!("{msg}");
         }
     }
 }

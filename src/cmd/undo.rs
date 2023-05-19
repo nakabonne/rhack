@@ -26,7 +26,7 @@ impl Cmd for Undo {
             Err(err) => return Err(err),
         };
 
-        if let Item::None = manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME] {
+        if matches!(manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME], Item::None) {
             self.debug("patch section not found");
             return Ok(());
         }
@@ -40,7 +40,7 @@ impl Cmd for Undo {
             let path = item.1["path"].as_value().unwrap().as_str().unwrap();
             let path = PathBuf::from(path);
             if path.starts_with(rhack_dir()) {
-                removed_crates.push(item.0)
+                removed_crates.push(item.0);
             }
         }
 
@@ -50,7 +50,7 @@ impl Cmd for Undo {
             .as_table_mut()
             .unwrap();
         for c in removed_crates {
-            println!("dropped {:?}", c);
+            println!("dropped {c:?}");
             table.remove(c);
         }
         if table.is_empty() {
@@ -69,7 +69,7 @@ impl Cmd for Undo {
 impl Undo {
     fn debug(&self, msg: &str) {
         if self.verbose {
-            println!("{}", msg);
+            println!("{msg}");
         }
     }
 }

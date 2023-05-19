@@ -10,7 +10,7 @@ pub struct SilentExit {
 }
 
 impl Display for SilentExit {
-    fn fmt(&self, _: &mut Formatter) -> fmt::Result {
+    fn fmt(&self, _: &mut Formatter<'_>) -> fmt::Result {
         Ok(())
     }
 }
@@ -23,7 +23,7 @@ impl WriteErrorHandler for io::Result<()> {
     fn handle_err(self, device: &str) -> Result<()> {
         match self {
             Err(e) if e.kind() == io::ErrorKind::BrokenPipe => bail!(SilentExit { code: 0 }),
-            result => result.with_context(|| format!("could not write to {}", device)),
+            result => result.with_context(|| format!("could not write to {device}")),
         }
     }
 }

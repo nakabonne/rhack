@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 use anyhow::{anyhow, Result};
-use clap::{AppSettings, Parser};
+use clap::Parser;
 use serde_json::Value;
 use toml_edit::Document;
 
@@ -24,12 +24,7 @@ pub trait Cmd {
 }
 
 #[derive(Debug, Parser)]
-#[clap(
-    about,
-    author,
-    global_setting(AppSettings::PropagateVersion),
-    version = "0.1.0"
-)]
+#[clap(about, author, version, propagate_version = true)]
 pub enum App {
     Edit(Edit),
     Undo(Undo),
@@ -38,24 +33,24 @@ pub enum App {
 impl Cmd for App {
     fn run(&self) -> Result<()> {
         match self {
-            App::Edit(cmd) => cmd.run(),
-            App::Undo(cmd) => cmd.run(),
+            Self::Edit(cmd) => cmd.run(),
+            Self::Undo(cmd) => cmd.run(),
         }
     }
 }
 
 // Gives back user-difined rhack dir path. If none, the default will be given.
+#[must_use]
 pub fn rhack_dir() -> PathBuf {
-    match env::var(RHACK_DIR_ENV_KEY) {
-        Ok(path) => PathBuf::from(path),
-        Err(_) => {
-            let home_dir = match home::home_dir() {
-                Some(path) => path,
-                None => panic!("failed to find home directory"),
+    env::var(RHACK_DIR_ENV_KEY).map_or_else(
+        |_| {
+            let Some(home_dir) = home::home_dir() else {
+                panic!("failed to find home directory")
             };
             home_dir.join(DEFAULT_RHACK_DIR_NAME)
-        }
-    }
+        },
+        PathBuf::from,
+    )
 }
 
 // Gives back the the path to Cargo.toml reffered from the working directory.
@@ -72,16 +67,15 @@ pub fn manifest_path() -> Result<String> {
         Err(err) => return Err(anyhow!("failed to run \"cargo locate-project\": {:#}", err)),
     };
     let out: Value = serde_json::from_slice(&out.stdout)?;
-    let path = match out["root"].as_str() {
-        Some(p) => p,
-        None => return Err(anyhow!("unexpected response from \"cargo locate-project\"")),
+    let Some(path) = out["root"].as_str() else {
+        return Err(anyhow!("unexpected response from \"cargo locate-project\""))
     };
     Ok(path.to_string())
 }
 
 // Gives back the parsed Cargo.toml placed at the working directory.
 pub fn load_manifest(manifest_path: &str) -> Result<Document> {
-    let manifest = match fs::read_to_string(&manifest_path) {
+    let manifest = match fs::read_to_string(manifest_path) {
         Ok(b) => b,
         Err(err) => return Err(anyhow!("failed to read from {}: {:#}", &manifest_path, err)),
     };
