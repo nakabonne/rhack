@@ -7,7 +7,7 @@ use std::process::Command;
 use std::{env, str::FromStr};
 
 use anyhow::{anyhow, Result};
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use serde_json::Value;
 use toml_edit::Document;
 
@@ -24,13 +24,28 @@ pub trait Cmd {
 }
 
 #[derive(Debug, Parser)]
-#[clap(about, author, version, propagate_version = true)]
-pub enum App {
+#[clap(about, bin_name = "cargo", author, version)]
+#[command(propagate_version = true)]
+pub struct Cli {
+    #[arg(hide = true)]
+    cargo: String,
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum Commands {
     Edit(Edit),
     Undo(Undo),
 }
 
-impl Cmd for App {
+impl Cmd for Cli {
+    fn run(&self) -> Result<()> {
+        self.command.run()
+    }
+}
+
+impl Cmd for Commands {
     fn run(&self) -> Result<()> {
         match self {
             Self::Edit(cmd) => cmd.run(),
