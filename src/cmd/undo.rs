@@ -31,8 +31,6 @@ impl Cmd for Undo {
             return Ok(());
         }
 
-        dbg!(&manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME]);
-
         let table = manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME]
             .as_inline_table()
             .expect("parsing as table should not failed during 'undo'")
