@@ -139,18 +139,30 @@ impl Edit {
         };
 
         // Insert [patch.crates-io] table if it doesn't exist.
-        if matches!(manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME], Item::None) {
+        if matches!(
+            manifest.get_key_value(format!("{PATCH_TABLE_NAME}.{REGISTRY_TABLE_NAME}").as_str()),
+            Some((_, Item::None))
+        ) {
             let mut t = Table::new();
             t.set_implicit(true);
+            t.fmt();
+
             manifest[PATCH_TABLE_NAME] = Item::Table(t);
             manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME] = Item::Table(Table::new());
-        }
+        };
+
         manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME][&self.crate_name]["path"] =
             value(new_path.to_str().unwrap());
 
         match fs::write(&manifest_path, manifest.to_string()) {
             Ok(_) => (),
-            Err(err) => return Err(anyhow!("failed to write to {}: {:#}", &manifest_path, err)),
+            Err(err) => {
+                return Err(anyhow!(
+                    "failed to write to {}: {:#}",
+                    &manifest_path.display(),
+                    err
+                ))
+            }
         }
 
         Ok(())
