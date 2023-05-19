@@ -1,5 +1,5 @@
-use rhack::cmd::{App, Cmd};
-use rhack::error::SilentExit;
+use cargo_rhack::cmd::{App, Cmd};
+use cargo_rhack::error::SilentExit;
 
 use clap::Parser;
 

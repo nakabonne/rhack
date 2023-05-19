@@ -70,6 +70,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
+name = "cargo-rhack"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "clap",
+ "home",
+ "once_cell",
+ "serde",
+ "serde_json",
+ "toml_edit",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -250,19 +263,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f4f29d145265ec1c483c7c654450edde0bfe043d3938d6972630663356d9500"
 dependencies = [
  "proc-macro2",
-]
-
-[[package]]
-name = "rhack"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "clap",
- "home",
- "once_cell",
- "serde",
- "serde_json",
- "toml_edit",
 ]
 
 [[package]]
