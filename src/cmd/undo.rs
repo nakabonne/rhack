@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
-use toml_edit::{Item, Table};
+use toml_edit::Item;
 
 /// Undo everything
 #[derive(Parser, Debug)]

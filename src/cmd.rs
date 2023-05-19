@@ -4,7 +4,7 @@ mod undo;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
-use std::{env, ffi::OsStr, path::Path, str::FromStr};
+use std::{env, str::FromStr};
 
 use anyhow::{anyhow, Result};
 use clap::Parser;
