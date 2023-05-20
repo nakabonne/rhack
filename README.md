@@ -17,7 +17,7 @@ reqwest = "0.11"
 
 Run the following:
 
-```
+```sh
 cargo rhack edit reqwest
 ```
 
@@ -34,7 +34,7 @@ Now your package uses the locally checked out copy instead of one from crates.io
 
 Simply run the `undo` command then you can undo all of the changes to your Cargo.toml:
 
-```
+```sh
 cargo rhack undo
 ```
 
@@ -50,7 +50,7 @@ For MacOS, Linux, and Windows, prebuilt binaries are available through [here](ht
 
 ### Debian/Ubuntu
 
-```
+```sh
 wget https://github.com/nakabonne/rhack/releases/download/v0.1.0/rhack_linux_amd64.deb
 apt install ./rhack_linux_amd64.deb
 ```
@@ -59,19 +59,19 @@ apt install ./rhack_linux_amd64.deb
 
 An [AUR package](https://aur.archlinux.org/packages/rhack/) is available.
 
-```
+```sh
 yay rhack
 ```
 
 ### Cargo
 
-```
+```sh
 cargo install rhack
 ```
 
 ### From source
 
-```
+```sh
 git clone https://github.com/nakabonne/rhack.git
 cargo build --release
 sudo install -m755 target/release/rhack /usr/local/bin/rhack
@@ -79,7 +79,7 @@ sudo install -m755 target/release/rhack /usr/local/bin/rhack
 
 If you want to generate the man page, you can install it with `scdoc`.
 
-```
+```sh
 sudo mkdir -p /usr/local/share/man/man1
 scdoc < rhack.1.scd > rhack.1
 sudo install -m644 rhack.1 /usr/local/share/man/man1/rhack.1
