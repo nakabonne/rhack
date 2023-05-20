@@ -1,6 +1,6 @@
 # cargo-rhack
 
-[![Version info](https://img.shields.io/crates/v/rhack.svg)](https://crates.io/crates/cargo-rhack)
+[![Version info](https://img.shields.io/crates/v/cargo-rhack.svg)](https://crates.io/crates/cargo-rhack)
 
 You want to quickly put a sneaky macro kind of like `dbg!` into external crates to find out how some internal data structure works? If so `cargo-rhack` is for you!
 
