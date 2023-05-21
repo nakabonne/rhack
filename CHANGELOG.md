@@ -5,19 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.1.2 (2023-05-21)
+
+<csr-id-bc2239651306548bc3432e42691e655f54ef6d28/>
 
 ### Other
 
  - <csr-id-bc2239651306548bc3432e42691e655f54ef6d28/> update workflows
 
+### Documentation
+
+ - <csr-id-ec96ba9965cc62331375e85b9dd383320fd0020c/> add changelog
+
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 6 commits contributed to the release over the course of 1 calendar day.
+ - 7 commits contributed to the release over the course of 1 calendar day.
  - 1 day passed between releases.
- - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 2 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -27,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Add changelog ([`ec96ba9`](https://github.com/simonsan/rhack/commit/ec96ba9965cc62331375e85b9dd383320fd0020c))
     - Release cargo-rhack v0.1.2 ([`f912275`](https://github.com/simonsan/rhack/commit/f912275f39b9c5262585dc6df544a2a86ab07123))
     - Update Readme ([`25b757e`](https://github.com/simonsan/rhack/commit/25b757e3d4edf0c806668972204489adaee99d5c))
     - Update workflows ([`bc22396`](https://github.com/simonsan/rhack/commit/bc2239651306548bc3432e42691e655f54ef6d28))
@@ -36,6 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </details>
 
 ## v0.1.1 (2023-05-19)
+
+<csr-id-6f61c97035b4603cb4a023dd35404589d9477c9c/>
+<csr-id-a5bfd3c8eae40ad5b39be2eaed4f45ee5c716ccb/>
 
 ### Chore
 
