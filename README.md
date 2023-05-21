@@ -2,6 +2,10 @@
 
 [![Version info](https://img.shields.io/crates/v/cargo-rhack.svg)](https://crates.io/crates/cargo-rhack)
 
+# This is temporary fork as long as the PR doesn't land in the main repository
+
+## Description
+
 You want to quickly put a sneaky macro kind of like `dbg!` into external crates to find out how some internal data structure works? If so `cargo-rhack` is for you!
 
 `cargo-rhack` makes it easier to edit external crates code that your project depends on.
@@ -57,24 +61,20 @@ apt install ./rhack_linux_amd64.deb
 
 ### Arch Linux
 
-An [AUR package](https://aur.archlinux.org/packages/rhack/) is available.
-
-```sh
-yay rhack
-```
+Currently there are no [AUR packages](https://aur.archlinux.org/packages/cargo-rhack/) available.
 
 ### Cargo
 
 ```sh
-cargo install rhack
+cargo install cargo-rhack
 ```
 
 ### From source
 
 ```sh
-git clone https://github.com/nakabonne/rhack.git
+git clone https://github.com/simonsan/cargo-rhack.git
 cargo build --release
-sudo install -m755 target/release/rhack /usr/local/bin/rhack
+sudo install -m755 target/release/cargo-rhack /usr/local/bin/cargo-rhack
 ```
 
 If you want to generate the man page, you can install it with `scdoc`.
