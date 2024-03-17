@@ -79,7 +79,8 @@ Currently there are no
 ```sh
 cargo install cargo-rhack
 ```
-<!-- 
+
+<!--
 ### From source
 
 ```sh
@@ -98,12 +99,13 @@ sudo install -m644 rhack.1 /usr/local/share/man/man1/rhack.1
 
 ## Contributing
 
-Found a bug? [Open an issue!](https://github.com/simonsan/cargo-rhack/issues/new/choose)
+Found a bug?
+[Open an issue!](https://github.com/simonsan/cargo-rhack/issues/new/choose)
 
 Got an idea for an improvement? Don't keep it to yourself!
 
-- [Contribute fixes](https://github.com/simonsan/cargo-rhack/contribute) or new features
-  via pull requests!
+- [Contribute fixes](https://github.com/simonsan/cargo-rhack/contribute) or new
+  features via pull requests!
 
 ## Code of Conduct
 
@@ -127,10 +129,10 @@ supported version of Rust.
 
 ## Acknowledgements
 
-The original author of this tool is [nakabonne](https://github.com/nakabonne),
-I revived it and fixed some things. I'm grateful for the original author's
-efforts and contributions to the Rust community. I hope this tool will be
-useful for many people in the Rust community going forward.
+The original author of this tool is [nakabonne](https://github.com/nakabonne), I
+revived it and fixed some things. I'm grateful for the original author's efforts
+and contributions to the Rust community. I hope this tool will be useful for
+many people in the Rust community going forward.
 
 ### Original inspiration
 

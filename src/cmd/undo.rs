@@ -21,6 +21,7 @@ impl Cmd for Undo {
             Ok(p) => p,
             Err(err) => return Err(err),
         };
+
         let manifest = match load_manifest(&manifest_path) {
             Ok(m) => m,
             Err(err) => return Err(err),
@@ -33,37 +34,43 @@ impl Cmd for Undo {
 
         let table = manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME]
             .as_inline_table()
-            .expect("parsing as table should not failed during 'undo'")
+            .ok_or_else(|| anyhow!("parsing as table should not failed during 'undo'"))?
             .clone()
             .into_table();
 
         let mut removed_crates = Vec::new();
 
-        for item in table.iter() {
-            let path = item.1["path"].as_value().unwrap().as_str().unwrap();
+        for item in &table {
+            let path = item.1["path"]
+                .as_value()
+                .ok_or_else(|| anyhow!("path not found in the patch table"))?
+                .as_str()
+                .ok_or_else(|| anyhow!("path is not a string"))?;
+
             let path = PathBuf::from(path);
+
             if path.starts_with(rhack_dir()) {
                 removed_crates.push(item.0);
             }
         }
 
         // NOTE: To avoid being mutable borrow even though borrowed as immutable once.
-        let mut manifest = load_manifest(&manifest_path).unwrap();
+        let mut manifest = load_manifest(&manifest_path)?;
         let table = manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME]
             .as_inline_table_mut()
-            .unwrap();
+            .ok_or_else(|| anyhow!("parsing as table should not failed during 'undo'"))?;
 
         for c in removed_crates {
             println!("dropped {c:?}");
-            table.remove(c);
+            _ = table.remove(c);
         }
         if table.is_empty() {
             // we probably can remove the whole table if it's empty
-            manifest.remove_entry(PATCH_TABLE_NAME);
+            _ = manifest.remove_entry(PATCH_TABLE_NAME);
         }
 
         match fs::write(&manifest_path, manifest.to_string()) {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(err) => {
                 return Err(anyhow!(
                     "failed to write to {}: {:#}",

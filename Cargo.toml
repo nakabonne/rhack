@@ -52,3 +52,110 @@ targets = [
 ]
 # Publish jobs to run in CI
 pr-run-mode = "plan"
+
+# see: https://nnethercote.github.io/perf-book/build-configuration.html
+[profile.dev]
+opt-level = 0
+debug = 0 # try for faster builds, usually 'true'
+strip = "debuginfo" # try for faster builds
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 4
+
+# compile dependencies with optimizations in dev mode
+# see: https://doc.rust-lang.org/stable/cargo/reference/profiles.html#overrides
+[profile.dev.package."*"]
+opt-level = 3
+debug = true
+
+[profile.release]
+opt-level = 3
+debug = false # true for profiling
+rpath = false
+lto = "fat"
+debug-assertions = false
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.test]
+opt-level = 1
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 4
+
+[profile.bench]
+opt-level = 3
+debug = true # true for profiling
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+
+# Allows quick RPM file generation, if "cargo-generate-rpm" is installed:
+#  cargo build --release; cargo generate-rpm
+# will result in a file like target/generate-rpm/pace-rs-0.6.1-1.x86_64.rpm
+[package.metadata.generate-rpm]
+assets = [
+  { source = "target/release/pace", dest = "/usr/bin/cargo-rhack", mode = "0755", config = false, doc = false }, # user = "root", group = "root" },
+]
+
+[lints.rust]
+unsafe_code = "forbid"
+# missing_docs = "warn"
+rust_2018_idioms = "warn"
+trivial_casts = "warn"
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+bad_style = "warn"
+dead_code = "warn"
+improper_ctypes = "warn"
+# missing_copy_implementations = "warn"
+# missing_debug_implementations = "warn"
+non_shorthand_field_patterns = "warn"
+no_mangle_generic_items = "warn"
+overflowing_literals = "warn"
+path_statements = "warn"
+patterns_in_fns_without_body = "warn"
+trivial_numeric_casts = "warn"
+unused_results = "warn"
+unused_extern_crates = "warn"
+unused_import_braces = "warn"
+unconditional_recursion = "warn"
+unused = "warn"
+unused_allocation = "warn"
+unused_comparisons = "warn"
+unused_parens = "warn"
+while_true = "warn"
+
+[lints.clippy]
+pedantic = "warn"
+nursery = "warn"
+expect_used = "warn"
+unwrap_used = "warn"
+enum_glob_use = "warn"
+correctness = "warn"
+suspicious = "warn"
+complexity = "warn"
+perf = "warn"
+cast_lossless = "warn"
+default_trait_access = "warn"
+doc_markdown = "warn"
+manual_string_new = "warn"
+match_same_arms = "warn"
+semicolon_if_nothing_returned = "warn"
+trivially_copy_pass_by_ref = "warn"
+module_name_repetitions = "allow"
+
+# cargo-binstall support
+# https://github.com/cargo-bins/cargo-binstall/blob/HEAD/SUPPORT.md
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/{ bin }-v{ version }/{ bin }-v{ version }-{ target }{ archive-suffix }"
+bin-dir = "{ bin }-{ target }/{ bin }{ binary-ext }"
+pkg-fmt = "txz"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-fmt = "zip"

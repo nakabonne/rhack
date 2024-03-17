@@ -11,7 +11,7 @@ fn main() {
         match e.downcast::<SilentExit>() {
             Ok(SilentExit { code }) => process::exit(code),
             Err(e) => {
-                let _ = writeln!(io::stderr(), "rhack: {:?}", e);
+                let _ = writeln!(io::stderr(), "rhack: {e:?}");
                 process::exit(1);
             }
         }

@@ -24,11 +24,15 @@ impl Cmd for Edit {
     fn run(&self) -> Result<()> {
         // Determine the destination directory and the source directory.
         let src = self.crate_local_path()?;
-        let mut dst = PathBuf::from(src.file_name().unwrap());
+        let mut dst =
+            PathBuf::from(src.file_name().ok_or_else(|| {
+                anyhow!("failed to determine the file name of the source directory")
+            })?);
+
         dst = rhack_dir().join(dst);
 
         match self.copy_dir(&src, &dst) {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(err) => return Err(anyhow!("failed to copy {:?} to {:?}: {}", src, dst, err)),
         }
 
@@ -40,6 +44,7 @@ impl Cmd for Edit {
 
 impl Edit {
     // Gives back the local path to the directory holding the given crate.
+    #[allow(unused_results)]
     fn crate_local_path(&self) -> Result<PathBuf> {
         #[derive(Deserialize)]
         struct Metadata {
@@ -61,6 +66,7 @@ impl Edit {
 
         let mut packages = HashMap::new();
         for p in metadata.packages {
+            // FIXME: unused result
             packages.insert(p.name, p.manifest_path);
         }
 
@@ -71,7 +77,8 @@ impl Edit {
         let manifest_path = PathBuf::from(manifest_path);
         let path = manifest_path
             .parent()
-            .expect("faild to determine the parent of manifest");
+            .ok_or_else(|| anyhow!("failed to determine the parent of manifest"))?;
+
         Ok(path.to_path_buf())
     }
 
@@ -114,7 +121,7 @@ impl Edit {
                         Some(filename) => {
                             let dest_path = dest.join(filename);
                             self.debug(&format!("    copy: {:?} -> {:?}", &path, &dest_path));
-                            fs::copy(&path, &dest_path)?;
+                            _ = fs::copy(&path, &dest_path)?;
                         }
                         None => {
                             println!("failed to copy: {path:?}");
@@ -151,11 +158,14 @@ impl Edit {
             manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME] = Item::Table(Table::new());
         };
 
-        manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME][&self.crate_name]["path"] =
-            value(new_path.to_str().unwrap());
+        manifest[PATCH_TABLE_NAME][REGISTRY_TABLE_NAME][&self.crate_name]["path"] = value(
+            new_path
+                .to_str()
+                .ok_or_else(|| anyhow!("failed to convert to str"))?,
+        );
 
         match fs::write(&manifest_path, manifest.to_string()) {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(err) => {
                 return Err(anyhow!(
                     "failed to write to {}: {:#}",
