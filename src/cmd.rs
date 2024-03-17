@@ -86,7 +86,7 @@ pub fn manifest_path() -> Result<PathBuf> {
         Some(it) => it,
         None => return Err(anyhow!("could convert to path")),
     }) else {
-        return Err(anyhow!("unexpected response from \"cargo locate-project\""))
+        return Err(anyhow!("unexpected response from \"cargo locate-project\""));
     };
     Ok(path)
 }

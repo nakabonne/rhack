@@ -1,4 +1,4 @@
-use cargo_rhack::cmd::{Cmd, Cli};
+use cargo_rhack::cmd::{Cli, Cmd};
 use cargo_rhack::error::SilentExit;
 
 use clap::Parser;

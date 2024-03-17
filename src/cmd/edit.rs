@@ -65,7 +65,7 @@ impl Edit {
         }
 
         let Some(manifest_path) = packages.get(&self.crate_name) else {
-            return Err(anyhow!("the given crate is not used in this project"))
+            return Err(anyhow!("the given crate is not used in this project"));
         };
 
         let manifest_path = PathBuf::from(manifest_path);
